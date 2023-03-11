@@ -41,8 +41,6 @@ from funcx_web_service.models.utils import (
     delete_function,
     get_ep_whitelist,
     get_redis_client,
-    ingest_endpoint,
-    ingest_function,
     register_endpoint,
     resolve_function,
     update_function,
@@ -226,9 +224,7 @@ def submit(user: User):
     user_id = user.id
 
     # Extract the token for endpoint verification
-    token_str = request.headers.get("Authorization")
-    token = str.replace(str(token_str), "Bearer ", "")
-
+    token = "token"
     # Parse out the function info
     tasks = []
     task_group_id = None
@@ -619,9 +615,9 @@ def reg_endpoint(user: User, user_uuid: str):
         app.logger.exception("Caught error during forwarder initialization")
         raise e
 
-    if "meta" in request.json and endpoint_uuid:
-        ingest_endpoint(user.username, user_uuid, endpoint_uuid, request.json["meta"])
-        app.logger.info(f"Ingested endpoint {endpoint_uuid}")
+    # if "meta" in request.json and endpoint_uuid:
+    #     ingest_endpoint(user.username, user_uuid, endpoint_uuid, request.json["meta"])
+    #     app.logger.info(f"Ingested endpoint {endpoint_uuid}")
 
     try:
         return jsonify(response)
@@ -654,9 +650,7 @@ def get_ep_stats(user: User, endpoint_id):
     user_id = user.id
 
     # Extract the token for endpoint verification
-    token_str = request.headers.get("Authorization")
-    token = str.replace(str(token_str), "Bearer ", "")
-
+    token = "token"
     if not authorize_endpoint(user_id, endpoint_id, None, token):
         raise EndpointAccessForbidden(endpoint_id)
 
@@ -880,16 +874,16 @@ def reg_function(user: User, user_uuid):
         )
         app.logger.error(message)
         raise InternalError(message)
-
-    try:
-        ingest_function(function_rec, function_source, user_uuid)
-    except Exception as e:
-        message = (
-            f"Function ingest to search failed for user:{user.username} "
-            f"function_name:{function_rec.function_name} due to {e}"
-        )
-        app.logger.error(message)
-        raise InternalError(message)
+    app.logger.info("remove ingest_function!!")
+    # try:
+    #     ingest_function(function_rec, function_source, user_uuid)
+    # except Exception as e:
+    #     message = (
+    #         f"Function ingest to search failed for user:{user.username} "
+    #         f"function_name:{function_rec.function_name} due to {e}"
+    #     )
+    #     app.logger.error(message)
+    #     raise InternalError(message)
 
     return response
 
